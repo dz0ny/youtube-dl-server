@@ -1,0 +1,16 @@
+{
+  "name": "YoutubeDL",
+  "version": "0.0.4",
+  "description": "Downloads youtube videos as mp3",
+	"icons": {"128": "ikona128.png" },
+  "page_action": {
+    "default_icon": "ikona128.png", // optional
+    "default_title": "Download MP3"
+  },
+  "background_page": "background.html",
+  "permissions": [
+    "<all_urls>",
+    "unlimitedStorage",
+    "tabs"
+  ]
+}

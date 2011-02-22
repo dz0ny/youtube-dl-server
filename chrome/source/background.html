@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    </head>
+    
+    <body>
+    <script type="text/javascript">
+    chrome.tabs.onUpdated.addListener(function(tabId, info, tab) {
+      if (tab.url.indexOf("youtube.com") !== -1){
+          chrome.pageAction.show(tabId)
+      };
+    });
+    chrome.pageAction.onClicked.addListener(function(tab) {
+      _req("http://localhost:9099/?url=" + tab.url, function(res) {
+        console.log(res)
+      })
+    });
+    function _req(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function() {
+          callback(this.response);
+        };
+        xhr.open("GET", url);
+        xhr.send();
+    };
+    </script>
+    </body>
+</html>
