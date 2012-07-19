@@ -1,4 +1,3 @@
-
 # youtube-dl-server
 
 Allows you to download mp3 or mp4 from popular video sites. You can use bookmarklets or Chrome extension to initiate download.
@@ -10,7 +9,7 @@ Allows you to download mp3 or mp4 from popular video sites. You can use bookmark
 ## Installation
 
     $ sudo apt-get install ffmpeg 
-    $ curl https://github.com/dz0ny/youtube-dl-server/raw/master/install.sh | sh
+    $ curl -L https://github.com/dz0ny/youtube-dl-server/raw/master/install.sh | bash
 
 # License 
 
