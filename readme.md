@@ -6,16 +6,10 @@ Allows you to download mp3 or mp4 from popular video sites. You can use bookmark
 ## Usage
 
     $ youtube-dl-server
-
-### API
-	
-	http://localhost:9099/?music=<url>  Download and convert to mp3 
-	http://localhost:9099/?video=<url>  Download and convert to iPad video
  
 ## Installation
 
-	$ sudo apt-get install ffmpeg 
-    $ sudo wget --no-check-certificate https://github.com/dz0ny/youtube-dl/raw/master/youtube-dl -O /usr/local/bin/youtube-dl && sudo chmod a+x /usr/local/bin/youtube-dl
+    $ sudo apt-get install ffmpeg 
     $ curl https://github.com/dz0ny/youtube-dl-server/raw/master/install.sh | sh
 
 # License 

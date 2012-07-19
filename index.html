@@ -1,47 +1,64 @@
 <!DOCTYPE html>
 <html>
+    
     <head>
         <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+        <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
         <title>youtubedl-server</title>
-        <style type="text/css" media="screen">
-            code{
-                display:block;
-            }
-        </style>    
     </head>
     
     <body>
-    <h1>youtubedl-server</h1>
-    <h2>Bookmarklets</h2>
-	    <a href="javascript:(function(){var%20a%3Ddocument.createElement%28%22iframe%22%29%3Ba.src%3D%22http%3A//localhost%3A9099/%3Fvideo%3D%22+window.location%3Ba.style.display%3D%22none%22%3Bdocument.body.appendChild%28a%29%3B})();">Download as Video</a>
-	    <a href="javascript:(function(){var%20a%3Ddocument.createElement%28%22iframe%22%29%3Ba.src%3D%22http%3A//localhost%3A9099/%3Fmusic%3D%22+window.location%3Ba.style.display%3D%22none%22%3Bdocument.body.appendChild%28a%29%3B})();">Download as Music</a>
-    <h2>API</h2>
-    <code>http://localhost:9099/?music=url  Download and convert to mp3 </code>
-    <code>http://localhost:9099/?video=url  Download and convert to iPad video</code>
-    <h2>Chrome Extension</h2>
-        <a href="/chrome/source.crx">Install extension</a>
-    <h2>License</h2>
-    <pre><code>(The MIT License)
-
-Copyright (c) 2011 Janez Troha <janez.troha@gmail.com>
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-'Software'), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</code></pre>
+        <div class="container">
+            <div class="row">
+                <h1 class="span12">youtubedl-server</h1>
+                <article class="span12">
+                    <h2>Bookmarklets(drag to toolbar)</h2>
+                    <a class="btn" href="javascript:(function(){var%20a%3Ddocument.createElement%28%22iframe%22%29%3Ba.src%3D%22http%3A//localhost%3A9099/%3Fmusic320mp3%3D%22+window.location%3Ba.style.display%3D%22none%22%3Bdocument.body.appendChild%28a%29%3B})();"><i class="icon-hdd"></i> Download as mp3(320kbps)</a>
+                    <a class="btn" href="javascript:(function(){var%20a%3Ddocument.createElement%28%22iframe%22%29%3Ba.src%3D%22http%3A//localhost%3A9099/%3Fmusic320aac%3D%22+window.location%3Ba.style.display%3D%22none%22%3Bdocument.body.appendChild%28a%29%3B})();"><i class="icon-hdd"></i> Download as mp3(320kbps)</a>
+                    <a class="btn" href="javascript:(function(){var%20a%3Ddocument.createElement%28%22iframe%22%29%3Ba.src%3D%22http%3A//localhost%3A9099/%3Fmusicbest%3D%22+window.location%3Ba.style.display%3D%22none%22%3Bdocument.body.appendChild%28a%29%3B})();"><i class="icon-hdd"></i> Download as best possible</a>
+                    <a class="btn" href="javascript:(function(){var%20a%3Ddocument.createElement%28%22iframe%22%29%3Ba.src%3D%22http%3A//localhost%3A9099/%3Fvideo%3D%22+window.location%3Ba.style.display%3D%22none%22%3Bdocument.body.appendChild%28a%29%3B})();"><i class="icon-hdd"></i> Download as video</a>
+                </article>
+                <article class="span12">
+                    <h2>API</h2>
+                    <ul class="unstyled">
+                        <li>
+                            http://localhost:9099/?music320aac=url Download and convert to mp3
+                        </li>
+                        <li>
+                            http://localhost:9099/?music320mp3=url Download and convert to aac
+                        </li>
+                        <li>
+                            http://localhost:9099/?musicbest=url Download and convert to best format
+                        </li>
+                        <li>
+                            http://localhost:9099/?video=url Download video
+                        </li>
+                    </ul>
+                </article>
+                <article class="span12">
+                    <h2>Chrome Extension</h2>
+                    <a href="/chrome/source.crx">Install extension</a>
+                </article>
+                <article class="span12">
+                    <h2>License</h2>
+                    <p class="span6">(The MIT License) Copyright (c) 2011 Janez Troha
+                        <janez.troha@gmail.com>Permission is hereby granted, free of charge, to any person obtaining
+                            a copy of this software and associated documentation files (the 'Software'),
+                            to deal in the Software without restriction, including without limitation
+                            the rights to use, copy, modify, merge, publish, distribute, sublicense,
+                            and/or sell copies of the Software, and to permit persons to whom the Software
+                            is furnished to do so, subject to the following conditions: The above copyright
+                            notice and this permission notice shall be included in all copies or substantial
+                            portions of the Software. THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY
+                            OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                            OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+                            IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+                            DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+                            ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+                            DEALINGS IN THE SOFTWARE.</p>
+                </article>
+            </div>
+        </div>
     </body>
+
 </html>

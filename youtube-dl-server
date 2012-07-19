@@ -1,155 +1,215 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # Author: Janez Troha
 # License: MIT
 # NOTE: This script heavily relies on Ubuntu
 # TODO:  * Queue for downloading, converting
 #        * Support for other OSes
-import sys, os, threading, time, webbrowser, re
 
-import imp, subprocess, shlex
+import sys
+import os
+import threading
+import webbrowser
+import re
+import youtube_dl
+import subprocess
+import shlex
 
 from urlparse import urlparse
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 try:
-  subprocess.call(['youtube-dl'], stdout=(file(os.path.devnull, 'w')), stderr=subprocess.STDOUT)
+    subprocess.call(['ffmpeg'], stdout=file(os.path.devnull, 'w'), stderr=subprocess.STDOUT)
 except (OSError, IOError):
-  raise sys.exit(u'ERROR: "youtube-dl" could not be found, please install it. Visit https://github.com/dz0ny/youtube-dl for more info!')
+    raise sys.exit(u'ERROR: "ffmpeg" could not be found, please install it!')
 
 try:
-  import pynotify
-  if not pynotify.init("Youtube-DL"):
-    print "there was a problem initializing the pynotify module"
+    import pynotify
+    if not pynotify.init('Youtube-DL'):
+        print 'there was a problem initializing the pynotify module'
 except:
-  print "you don't seem to have pynotify installed"
-
-##Download locations detection
-userhome = os.path.expanduser("~")
-try:
-  #This is Ubuntu flavored thing
-  userdirs = open(os.path.join(userhome, ".config/user-dirs.dirs"), "r")
-  paths = userdirs.read()
-  regexVideo = re.compile("XDG_VIDEOS_DIR=\"(.+)\"",re.MULTILINE|re.UNICODE)
-  regexMusic = re.compile("XDG_MUSIC_DIR=\"(.+)\"",re.MULTILINE|re.UNICODE)
-  VideoPath = regexVideo.findall(paths)[0].replace("$HOME",userhome)
-  MusicPath = regexMusic.findall(paths)[0].replace("$HOME",userhome)
-except IOError:
-  VideoPath = os.path.join(userhome, "Video")
-  MusicPath = os.path.join(userhome, "Music")
-
-def Notify(text):
-  try:
-    n = pynotify.Notification("Youtube-dl", text, 'dialog-info')
-    n.set_timeout(1)
-    n.show()
-  except:
     print "you don't seem to have pynotify installed"
 
+##Download locations detection
+
+userhome = os.path.expanduser('~')
+try:
+
+  # This is Ubuntu flavored thing
+
+    userdirs = open(os.path.join(userhome, '.config/user-dirs.dirs'), 'r')
+    paths = userdirs.read()
+    regexVideo = re.compile('XDG_VIDEOS_DIR="(.+)"', re.MULTILINE | re.UNICODE)
+    regexMusic = re.compile('XDG_MUSIC_DIR="(.+)"', re.MULTILINE | re.UNICODE)
+    VideoPath = regexVideo.findall(paths)[0].replace('$HOME', userhome)
+    MusicPath = regexMusic.findall(paths)[0].replace('$HOME', userhome)
+except IOError:
+    VideoPath = os.path.join(userhome, 'Video')
+    MusicPath = os.path.join(userhome, 'Music')
+
+
+def Notify(text):
+    try:
+        n = pynotify.Notification('Youtube-dl', text, 'dialog-info')
+        n.set_timeout(1)
+        n.show()
+    except:
+        print "you don't seem to have pynotify installed"
+
+
 class ServerThread(threading.Thread):
-  def __init__(self, port):
-    self.port = port
-    threading.Thread.__init__(self)
 
-  def run(self):
-    self.server = StoppableHttpServer(('localhost', self.port), StoppableHttpServerRequestHandler)
-    Notify("Server started on 'http://localhost:" + str(self.port) + "'")
-    webbrowser.open("http://localhost:" + str(self.port))
-    self.server.serve_forever()
+    def __init__(self, port):
+        self.port = port
+        threading.Thread.__init__(self)
 
-  def serverIsAlive(self):
-    return self.server.shouldRun
-  
-class StoppableHttpServer (HTTPServer):
-  def serve_forever(self):
-    self.shouldRun = True
-    while self.shouldRun:
-      self.handle_request()
+    def run(self):
+        self.server = StoppableHttpServer(('localhost', self.port),
+                                          StoppableHttpServerRequestHandler)
+        Notify("Server started on 'http://localhost:" + str(self.port) + "'")
+        webbrowser.open('http://localhost:' + str(self.port))
+        self.server.serve_forever()
+
+    def serverIsAlive(self):
+        return self.server.shouldRun
+
+
+class StoppableHttpServer(HTTPServer):
+
+    def serve_forever(self):
+        self.shouldRun = True
+        while self.shouldRun:
+            self.handle_request()
+
 
 class StoppableHttpServerRequestHandler(BaseHTTPRequestHandler):
+
   # don't log stuff
-  def log_message(self, format, *args):
-    pass  
 
-  def do_GET(self):
-    try:
-      if self.path.endswith(".html") or self.path.endswith(".crx") or self.path == "/":
-        
-        #rewrite url
-        if self.path == "/":
-          self.path = "/index.html"
+    def log_message(self, format, *args):
+        pass
 
-        f = open(sys.path[0] + self.path)
+    def do_GET(self):
+        try:
+            if self.path.endswith('.html') or self.path.endswith('.crx') or self.path == '/':
 
-        if self.path.endswith(".crx"):
-          self._sendHeader(200, 'application/x-chrome-extension')
+        # rewrite url
+
+                if self.path == '/':
+                    self.path = '/index.html'
+
+                f = open(sys.path[0] + self.path)
+
+                if self.path.endswith('.crx'):
+                    self._sendHeader(200, 'application/x-chrome-extension')
+                else:
+                    self._sendHeader(200, 'text/html')
+
+                self.wfile.write(f.read())
+                f.close()
+                return
+            elif self.path == '/die':
+                Notify('Server kill request received')
+                self._sendHeader(200, 'text/plain')
+                self.wfile.write('Server kill request received')
+                self.server.shouldRun = False
+                return
+            elif self._tryResponse('music320mp3', Music320mp3):
+                pass
+            elif self._tryResponse('music320aac', Music320aac):
+                pass
+            elif self._tryResponse('musicbest', MusicBest):
+                pass
+            elif self._tryResponse('video', Video):
+                pass
+            else:
+                raise IOError
+            return
+        except IOError:
+            self.send_error(404, 'File Not Found: %s' % self.path)
+
+    def _sendHeader(self, response_code, content_type):
+        self.send_response(response_code)
+        self.send_header('Content-type', content_type)
+        self.end_headers()
+
+    def _tryResponse(self, handler, postprocesor):
+        if '?' + handler + '=' in self.path:
+            self._sendHeader(200, 'text/plain')
+            self.wfile.write('Downloading of "' + self.path + '" started')
+            run = postprocesor(self.path)
+            run.start()
+            return True
         else:
-          self._sendHeader(200, 'text/html')
-
-        self.wfile.write(f.read())
-        f.close()
-        return  
-      elif(self.path == '/die'):
-        Notify("Server kill request received")
-        self._sendHeader(200, 'text/plain')
-        self.wfile.write('Server kill request received')
-        self.server.shouldRun = False
-        return
-      elif self._tryResponse("music", Music):
-        pass
-      elif self._tryResponse("video", Video):
-        pass
-      else:
-        raise IOError       
-      return        
-    except IOError:
-      self.send_error(404,'File Not Found: %s' % self.path)
-
-  def _sendHeader(self, response_code, content_type):
-    self.send_response(response_code)
-    self.send_header('Content-type', content_type)
-    self.end_headers()
-
-  def _tryResponse(self, handler, postprocesor):
-    if("?" + handler + "=" in self.path):
-      self._sendHeader(200, 'text/plain')
-      self.wfile.write('Downloading of "'+ self.path +'" started')
-      run = postprocesor(self.path)
-      run.start()
-      return True
-    else:
-      return False
+            return False
 
 
 ##Music handler
-class Music(threading.Thread):
-  def __init__(self, url):
-    self.url = urlparse(url).query.replace("music=","")
-    self.command = 'youtube-dl -t "%s" -T mp3 -C rm <filepath>' % self.url
-    Notify('Downloading of "'+ self.url+'" started')
-    threading.Thread.__init__(self)
 
-  def run(self):
-    subprocess.call(shlex.split(self.command))
+class Music320mp3(threading.Thread):
 
-##Video handler
+    def __init__(self, url):
+        self.url = urlparse(url).query.replace('music320mp3=', '')
+        self.command = '%s -t "%s" --extract-audio --audio-format mp3  --audio-quality 320k' \
+            % (sys.argv[0], self.url)
+        Notify('Downloading of "' + self.url + '" started')
+        threading.Thread.__init__(self)
+
+    def run(self):
+        subprocess.call(shlex.split(self.command))
+
+
+class Music320aac(threading.Thread):
+
+    def __init__(self, url):
+        self.url = urlparse(url).query.replace('music320aac=', '')
+        self.command = '%s -t "%s" --extract-audio --audio-format aac  --audio-quality 320k' \
+            % (sys.argv[0], self.url)
+        Notify('Downloading of "' + self.url + '" started')
+        threading.Thread.__init__(self)
+
+    def run(self):
+        subprocess.call(shlex.split(self.command))
+
+
+class MusicBest(threading.Thread):
+
+    def __init__(self, url):
+        self.url = urlparse(url).query.replace('musicbest=', '')
+        self.command = '%s -t "%s" --extract-audio' % (sys.argv[0], self.url)
+        Notify('Downloading of "' + self.url + '" started')
+        threading.Thread.__init__(self)
+
+    def run(self):
+        subprocess.call(shlex.split(self.command))
+
 class Video(threading.Thread):
-  def __init__(self, url):
-    self.url = urlparse(url).query.replace("video=","")
-    self.command = 'youtube-dl -t "%s" -T mp4 -C rm <filepath>' % self.url
-    Notify('Downloading of "'+ self.url+'" started')
-    threading.Thread.__init__(self)
 
-  def run(self):
-    subprocess.call(shlex.split(self.command))
+    def __init__(self, url):
+        self.url = urlparse(url).query.replace('video=', '')
+        self.command = '%s -t "%s"' % (sys.argv[0], self.url)
+        Notify('Downloading of "' + self.url + '" started')
+        threading.Thread.__init__(self)
+
+    def run(self):
+        subprocess.call(shlex.split(self.command))
 
 ## Main routine ##
+
 def main():
-  try:
-    server = ServerThread(9099)
-    server.start()
-  except:
-    sys.exit(0)
+    try:
+        server = ServerThread(9099)
+        server.start()
+    except:
+        sys.exit(0)
+
 
 if __name__ == '__main__':
-    main()
+    try:
+        if len(sys.argv) > 1:
+            youtube_dl.main()
+        else:
+            main()
+    except:
+        print 'Unknow error'
